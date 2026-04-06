@@ -4,8 +4,8 @@ import cupy as cp
 import time
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))# to parent dir  
-from cupyint import trapz_integrate, simpson_integrate, booles_integrate, gauss_integrate, mc_integrate, adpmc_integrate
-from cupyint import set_backend, get_data_type
+from flashquad import trapz_integrate, simpson_integrate, booles_integrate, gauss_integrate, mc_integrate, adpmc_integrate
+from flashquad import set_backend, get_data_type
 
 data_type=cp.float32
 set_backend(data_type)

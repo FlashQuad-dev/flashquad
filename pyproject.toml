@@ -1,0 +1,38 @@
+[project]
+name = "flashquad"
+version = "0.1.0"
+description = "A user-friendly Python numerical integration library with GPU acceleration"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.11"
+authors = [
+    { name = "Ze Ouyang", email = "ze_ouyang@utexas.edu" },
+    { name = "Zijian Yi", email = "zijianyi@utexas.edu" },
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "numpy==2.3.2",
+    "array-api-compat==1.14.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==9.0.2",
+    "ruff==0.15.8",
+    "ty==0.0.26",
+    "scipy==1.17.1",
+]
+
+[project.urls]
+Homepage = "https://github.com/FlashQuad-dev/flashquad"
+
+[build-system]
+requires = ["uv-build>=0.11.2,<0.12"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-root = ""
