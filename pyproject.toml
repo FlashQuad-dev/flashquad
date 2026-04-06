@@ -25,6 +25,9 @@ dev = [
     "ruff==0.15.8",
     "ty==0.0.26",
     "scipy==1.17.1",
+    "torch==2.11.0",
+    "cupy-cuda13x==14.0.1",
+    "jax[cuda13]==0.9.2",
 ]
 
 [project.urls]
