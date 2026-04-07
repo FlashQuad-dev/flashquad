@@ -10,8 +10,7 @@ def _booles_rule(xp, y, x, axis):
     n = y.shape[axis]
     if (n - 1) % 4 != 0:
         raise ValueError(
-            "Number of points minus one must be a multiple of 4 "
-            "for Boole's rule."
+            "Number of points minus one must be a multiple of 4 for Boole's rule."
         )
     dx = (x[-1] - x[0]) / (n - 1)
     c = np.ones(n, dtype=np.float64)

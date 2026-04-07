@@ -22,17 +22,13 @@ def gauss(xp, dtype, func, intervals, num_points, *, params=None, boundary=None)
         grids.append(0.5 * (b - a) * nodes + 0.5 * (b + a))
         weights.append(0.5 * (b - a) * w)
 
-    mesh = xp.meshgrid(*grids, indexing='ij')
+    mesh = xp.meshgrid(*grids, indexing="ij")
     expanded_mesh = [m[None, ...] for m in mesh]
     Y = _evaluate(xp, func, expanded_mesh, ndim, params, boundary)
 
     for dim in reversed(range(ndim)):
         w = weights[dim]
-        shape = (
-            [1] * (dim + 1)
-            + [w.shape[0]]
-            + [1] * (Y.ndim - dim - 2)
-        )
+        shape = [1] * (dim + 1) + [w.shape[0]] + [1] * (Y.ndim - dim - 2)
         w = xp.reshape(w, tuple(shape))
         Y = xp.sum(Y * w, axis=dim + 1)
 

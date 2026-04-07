@@ -1,5 +1,6 @@
 """FlashQuad — numerical integrator with pluggable array backends."""
 
+from typing import Any
 from flashquad.utils import _resolve_backend_namespace, _default_dtype, _validate_dtype
 from flashquad.methods import trapz as _trapz
 from flashquad.methods import simpson as _simpson
@@ -24,11 +25,9 @@ class FlashQuad:
         Defaults to the backend's ``float64``.
     """
 
-    def __init__(self, backend="numpy", dtype=None):
+    def __init__(self, backend: str, dtype: Any = None):
         if not isinstance(backend, str):
-            raise TypeError(
-                f"backend must be a string, got {type(backend).__name__}"
-            )
+            raise TypeError(f"backend must be a string, got {type(backend).__name__}")
         self._backend_name = backend
         self.xp = _resolve_backend_namespace(backend)
         if dtype is not None:
@@ -38,15 +37,18 @@ class FlashQuad:
             self.dtype = _default_dtype(self.xp)
 
     def __repr__(self):
-        return (
-            f"FlashQuad(backend={self._backend_name!r}, dtype={self.dtype!r})"
-        )
+        return f"FlashQuad(backend={self._backend_name!r}, dtype={self.dtype!r})"
 
     # ---- integration methods ------------------------------------------------
 
     def trapz(
-        self, func, intervals, num_points, *,
-        params=None, boundary=None,
+        self,
+        func,
+        intervals,
+        num_points,
+        *,
+        params=None,
+        boundary=None,
     ):
         """Integrate using the composite trapezoidal rule.
 
@@ -60,52 +62,92 @@ class FlashQuad:
             boundary: Optional mask function applied to the integrand.
         """
         return _trapz(
-            self.xp, self.dtype, func, intervals, num_points,
-            params=params, boundary=boundary,
+            self.xp,
+            self.dtype,
+            func,
+            intervals,
+            num_points,
+            params=params,
+            boundary=boundary,
         )
 
     def simpson(
-        self, func, intervals, num_points, *,
-        params=None, boundary=None,
+        self,
+        func,
+        intervals,
+        num_points,
+        *,
+        params=None,
+        boundary=None,
     ):
         """Integrate using composite Simpson's 1/3 rule.
 
         Args: See :meth:`trapz`. Each entry in *num_points* must be odd.
         """
         return _simpson(
-            self.xp, self.dtype, func, intervals, num_points,
-            params=params, boundary=boundary,
+            self.xp,
+            self.dtype,
+            func,
+            intervals,
+            num_points,
+            params=params,
+            boundary=boundary,
         )
 
     def booles(
-        self, func, intervals, num_points, *,
-        params=None, boundary=None,
+        self,
+        func,
+        intervals,
+        num_points,
+        *,
+        params=None,
+        boundary=None,
     ):
         """Integrate using composite Boole's rule.
 
         Args: See :meth:`trapz`. ``(num_points[i] - 1)`` must be divisible by 4.
         """
         return _booles(
-            self.xp, self.dtype, func, intervals, num_points,
-            params=params, boundary=boundary,
+            self.xp,
+            self.dtype,
+            func,
+            intervals,
+            num_points,
+            params=params,
+            boundary=boundary,
         )
 
     def gauss(
-        self, func, intervals, num_points, *,
-        params=None, boundary=None,
+        self,
+        func,
+        intervals,
+        num_points,
+        *,
+        params=None,
+        boundary=None,
     ):
         """Integrate using Gauss-Legendre quadrature.
 
         Args: See :meth:`trapz`.
         """
         return _gauss(
-            self.xp, self.dtype, func, intervals, num_points,
-            params=params, boundary=boundary,
+            self.xp,
+            self.dtype,
+            func,
+            intervals,
+            num_points,
+            params=params,
+            boundary=boundary,
         )
 
     def mc(
-        self, func, intervals, num_points, *,
-        params=None, boundary=None,
+        self,
+        func,
+        intervals,
+        num_points,
+        *,
+        params=None,
+        boundary=None,
     ):
         """Integrate using Monte Carlo sampling.
 
@@ -117,13 +159,24 @@ class FlashQuad:
             boundary: Optional mask function.
         """
         return _mc(
-            self.xp, self.dtype, func, intervals, num_points,
-            params=params, boundary=boundary,
+            self.xp,
+            self.dtype,
+            func,
+            intervals,
+            num_points,
+            params=params,
+            boundary=boundary,
         )
 
     def adpmc(
-        self, func, intervals, num_points, *,
-        params=None, boundary=None, num_iterations=10,
+        self,
+        func,
+        intervals,
+        num_points,
+        *,
+        params=None,
+        boundary=None,
+        num_iterations=10,
     ):
         """Integrate using iterative Monte Carlo sampling.
 
@@ -136,6 +189,12 @@ class FlashQuad:
             num_iterations: Number of sampling iterations.
         """
         return _adpmc(
-            self.xp, self.dtype, func, intervals, num_points,
-            params=params, boundary=boundary, num_iterations=num_iterations,
+            self.xp,
+            self.dtype,
+            func,
+            intervals,
+            num_points,
+            params=params,
+            boundary=boundary,
+            num_iterations=num_iterations,
         )

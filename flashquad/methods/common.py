@@ -4,10 +4,9 @@
 def _build_grid(xp, intervals, num_points, dtype):
     """Return uniform grids, meshgrid, and batch-expanded mesh."""
     grids = [
-        xp.linspace(b[0], b[1], n, dtype=dtype)
-        for b, n in zip(intervals, num_points)
+        xp.linspace(b[0], b[1], n, dtype=dtype) for b, n in zip(intervals, num_points)
     ]
-    mesh = xp.meshgrid(*grids, indexing='ij')
+    mesh = xp.meshgrid(*grids, indexing="ij")
     expanded_mesh = [m[None, ...] for m in mesh]
     return grids, expanded_mesh
 

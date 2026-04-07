@@ -4,8 +4,15 @@ import numpy as np
 
 
 def adpmc(
-    xp, dtype, func, intervals, num_points, *,
-    params=None, boundary=None, num_iterations=10,
+    xp,
+    dtype,
+    func,
+    intervals,
+    num_points,
+    *,
+    params=None,
+    boundary=None,
+    num_iterations=10,
 ):
     """Integrate using iterative Monte Carlo sampling."""
     vector_length = params.shape[0] if params is not None else 1

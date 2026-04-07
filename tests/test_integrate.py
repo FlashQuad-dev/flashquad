@@ -7,9 +7,10 @@ from flashquad import FlashQuad
 
 # --- Integrands with known analytical results ---
 
+
 def square(x):
     """x^2, integral on [0,1] = 1/3."""
-    return x ** 2
+    return x**2
 
 
 def xy(x, y):
@@ -20,12 +21,12 @@ def xy(x, y):
 def parametric_poly(x, params):
     """a*x^2 + b, integral on [0,1] = a/3 + b."""
     a, b = params[0], params[1]
-    return a * x ** 2 + b
+    return a * x**2 + b
 
 
 def unit_disk(x, y):
     """Quarter-unit-disk mask in [0,1]^2."""
-    return x ** 2 + y ** 2 < 1.0
+    return x**2 + y**2 < 1.0
 
 
 PARAMS = np.array([[2.0, 1.0], [3.0, 0.5]])
@@ -41,7 +42,10 @@ class TestTrapz:
 
     def test_1d_with_params(self):
         result = quad.trapz(
-            parametric_poly, [[0, 1]], [1001], params=PARAMS,
+            parametric_poly,
+            [[0, 1]],
+            [1001],
+            params=PARAMS,
         )
         np.testing.assert_allclose(result, EXPECTED, rtol=1e-4)
 
@@ -57,7 +61,10 @@ class TestSimpson:
 
     def test_1d_with_params(self):
         result = quad.simpson(
-            parametric_poly, [[0, 1]], [1001], params=PARAMS,
+            parametric_poly,
+            [[0, 1]],
+            [1001],
+            params=PARAMS,
         )
         np.testing.assert_allclose(result, EXPECTED, rtol=1e-5)
 
@@ -69,7 +76,10 @@ class TestBooles:
 
     def test_1d_with_params(self):
         result = quad.booles(
-            parametric_poly, [[0, 1]], [1001], params=PARAMS,
+            parametric_poly,
+            [[0, 1]],
+            [1001],
+            params=PARAMS,
         )
         np.testing.assert_allclose(result, EXPECTED, rtol=1e-5)
 
@@ -81,7 +91,10 @@ class TestGauss:
 
     def test_1d_with_params(self):
         result = quad.gauss(
-            parametric_poly, [[0, 1]], [50], params=PARAMS,
+            parametric_poly,
+            [[0, 1]],
+            [50],
+            params=PARAMS,
         )
         np.testing.assert_allclose(result, EXPECTED, rtol=1e-5)
 
@@ -99,7 +112,10 @@ class TestMC:
     def test_1d_with_params(self):
         np.random.seed(42)
         result = quad.mc(
-            parametric_poly, [[0, 1]], 500_000, params=PARAMS,
+            parametric_poly,
+            [[0, 1]],
+            500_000,
+            params=PARAMS,
         )
         np.testing.assert_allclose(result, EXPECTED, rtol=0.05)
 
@@ -108,7 +124,10 @@ class TestAdaptiveMC:
     def test_1d(self):
         np.random.seed(42)
         result = quad.adpmc(
-            square, [[0, 1]], 500_000, num_iterations=5,
+            square,
+            [[0, 1]],
+            500_000,
+            num_iterations=5,
         )
         np.testing.assert_allclose(result.item(), 1 / 3, rtol=0.05)
 
@@ -116,7 +135,9 @@ class TestAdaptiveMC:
 class TestBoundary:
     def test_trapz_with_boundary(self):
         result = quad.trapz(
-            xy, [[0, 1], [0, 1]], [201, 201],
+            xy,
+            [[0, 1], [0, 1]],
+            [201, 201],
             boundary=unit_disk,
         )
         np.testing.assert_allclose(result.item(), 0.125, rtol=0.05)
@@ -129,7 +150,9 @@ class TestTorchBackend:
         assert isinstance(result, torch.Tensor)
         assert result.dtype == torch.float32
         np.testing.assert_allclose(
-            result.detach().cpu().numpy(), 1 / 3, rtol=1e-4,
+            result.detach().cpu().numpy(),
+            1 / 3,
+            rtol=1e-4,
         )
 
     def test_torch_float32(self):

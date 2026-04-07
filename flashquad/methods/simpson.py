@@ -9,9 +9,7 @@ def _simpsons_rule(xp, y, x, axis):
     """Composite Simpson's 1/3 rule along the given axis."""
     n = y.shape[axis]
     if n % 2 == 0:
-        raise ValueError(
-            "Number of points must be odd for Simpson's rule."
-        )
+        raise ValueError("Number of points must be odd for Simpson's rule.")
     dx = (x[-1] - x[0]) / (n - 1)
     c = np.ones(n, dtype=np.float64)
     c[1:-1:2] = 4
