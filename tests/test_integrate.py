@@ -1,14 +1,8 @@
-import numpy as np
 import pytest
+import numpy as np
+import torch
 
-from flashquad import (
-    trapz_integrate,
-    simpson_integrate,
-    booles_integrate,
-    gauss_integrate,
-    mc_integrate,
-    adpmc_integrate,
-)
+from flashquad import FlashQuad
 
 
 # --- Integrands with known analytical results ---
@@ -37,30 +31,32 @@ def unit_disk(x, y):
 PARAMS = np.array([[2.0, 1.0], [3.0, 0.5]])
 EXPECTED = PARAMS[:, 0] / 3 + PARAMS[:, 1]
 
+quad = FlashQuad("numpy")
+
 
 class TestTrapz:
     def test_1d(self):
-        result = trapz_integrate(square, [[0, 1]], [1001])
+        result = quad.trapz(square, [[0, 1]], [1001])
         np.testing.assert_allclose(result.item(), 1 / 3, rtol=1e-4)
 
     def test_1d_with_params(self):
-        result = trapz_integrate(
+        result = quad.trapz(
             parametric_poly, [[0, 1]], [1001], params=PARAMS,
         )
         np.testing.assert_allclose(result, EXPECTED, rtol=1e-4)
 
     def test_2d(self):
-        result = trapz_integrate(xy, [[0, 1], [0, 1]], [101, 101])
+        result = quad.trapz(xy, [[0, 1], [0, 1]], [101, 101])
         np.testing.assert_allclose(result.item(), 0.25, rtol=1e-3)
 
 
 class TestSimpson:
     def test_1d(self):
-        result = simpson_integrate(square, [[0, 1]], [1001])
+        result = quad.simpson(square, [[0, 1]], [1001])
         np.testing.assert_allclose(result.item(), 1 / 3, rtol=1e-10)
 
     def test_1d_with_params(self):
-        result = simpson_integrate(
+        result = quad.simpson(
             parametric_poly, [[0, 1]], [1001], params=PARAMS,
         )
         np.testing.assert_allclose(result, EXPECTED, rtol=1e-10)
@@ -68,11 +64,11 @@ class TestSimpson:
 
 class TestBooles:
     def test_1d(self):
-        result = booles_integrate(square, [[0, 1]], [1001])
+        result = quad.booles(square, [[0, 1]], [1001])
         np.testing.assert_allclose(result.item(), 1 / 3, rtol=1e-10)
 
     def test_1d_with_params(self):
-        result = booles_integrate(
+        result = quad.booles(
             parametric_poly, [[0, 1]], [1001], params=PARAMS,
         )
         np.testing.assert_allclose(result, EXPECTED, rtol=1e-10)
@@ -80,29 +76,29 @@ class TestBooles:
 
 class TestGauss:
     def test_1d(self):
-        result = gauss_integrate(square, [[0, 1]], [50])
+        result = quad.gauss(square, [[0, 1]], [50])
         np.testing.assert_allclose(result.item(), 1 / 3, rtol=1e-10)
 
     def test_1d_with_params(self):
-        result = gauss_integrate(
+        result = quad.gauss(
             parametric_poly, [[0, 1]], [50], params=PARAMS,
         )
         np.testing.assert_allclose(result, EXPECTED, rtol=1e-10)
 
     def test_2d(self):
-        result = gauss_integrate(xy, [[0, 1], [0, 1]], [20, 20])
+        result = quad.gauss(xy, [[0, 1], [0, 1]], [20, 20])
         np.testing.assert_allclose(result.item(), 0.25, rtol=1e-10)
 
 
 class TestMC:
     def test_1d(self):
         np.random.seed(42)
-        result = mc_integrate(square, [[0, 1]], 500_000)
+        result = quad.mc(square, [[0, 1]], 500_000)
         np.testing.assert_allclose(result.item(), 1 / 3, rtol=0.05)
 
     def test_1d_with_params(self):
         np.random.seed(42)
-        result = mc_integrate(
+        result = quad.mc(
             parametric_poly, [[0, 1]], 500_000, params=PARAMS,
         )
         np.testing.assert_allclose(result, EXPECTED, rtol=0.05)
@@ -111,7 +107,7 @@ class TestMC:
 class TestAdaptiveMC:
     def test_1d(self):
         np.random.seed(42)
-        result = adpmc_integrate(
+        result = quad.adpmc(
             square, [[0, 1]], 500_000, num_iterations=5,
         )
         np.testing.assert_allclose(result.item(), 1 / 3, rtol=0.05)
@@ -119,24 +115,57 @@ class TestAdaptiveMC:
 
 class TestBoundary:
     def test_trapz_with_boundary(self):
-        result = trapz_integrate(
+        result = quad.trapz(
             xy, [[0, 1], [0, 1]], [201, 201],
             boundary=unit_disk,
         )
-        # Integral of x*y over the quarter unit disk = 1/8
         np.testing.assert_allclose(result.item(), 0.125, rtol=0.05)
 
 
-class TestExplicitBackend:
-    def test_xp_parameter(self):
-        result = trapz_integrate(
-            square, [[0, 1]], [1001], xp=np,
+class TestTorchBackend:
+    def test_torch_backend(self):
+        tq = FlashQuad("torch")
+        result = tq.trapz(square, [[0, 1]], [1001])
+        assert isinstance(result, torch.Tensor)
+        assert result.dtype == torch.float64
+        np.testing.assert_allclose(
+            result.detach().cpu().numpy(), 1 / 3, rtol=1e-4,
         )
-        np.testing.assert_allclose(result.item(), 1 / 3, rtol=1e-4)
 
-    def test_dtype_float32(self):
-        result = trapz_integrate(
-            square, [[0, 1]], [1001], dtype=np.float32,
-        )
+    def test_torch_float32(self):
+        tq = FlashQuad("torch", dtype=torch.float32)
+        result = tq.trapz(square, [[0, 1]], [1001])
+        assert isinstance(result, torch.Tensor)
+        assert result.dtype == torch.float32
+
+
+class TestNumpyDtype:
+    def test_numpy_float32(self):
+        q = FlashQuad("numpy", dtype=np.float32)
+        result = q.trapz(square, [[0, 1]], [1001])
         assert result.dtype == np.float32
         np.testing.assert_allclose(result.item(), 1 / 3, rtol=1e-4)
+
+
+class TestDtypeValidation:
+    def test_torch_dtype_rejected_for_numpy(self):
+        with pytest.raises(TypeError, match="not compatible with backend 'numpy'"):
+            FlashQuad("numpy", dtype=torch.float32)
+
+    def test_numpy_dtype_rejected_for_torch(self):
+        with pytest.raises(TypeError, match="not compatible with backend 'torch'"):
+            FlashQuad("torch", dtype=np.float32)
+
+    def test_backend_must_be_string(self):
+        with pytest.raises(TypeError, match="backend must be a string"):
+            FlashQuad(np)
+
+    def test_unsupported_backend(self):
+        with pytest.raises(ValueError, match="Unsupported backend"):
+            FlashQuad("tensorflow")
+
+
+class TestRepr:
+    def test_repr(self):
+        q = FlashQuad("numpy")
+        assert "numpy" in repr(q)
