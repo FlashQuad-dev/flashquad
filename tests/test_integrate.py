@@ -148,7 +148,7 @@ class TestTorchBackend:
         tq = FlashQuad("torch")
         result = tq.trapz(square, [[0, 1]], [1001])
         assert isinstance(result, torch.Tensor)
-        assert result.dtype == torch.float32
+        assert result.dtype == torch.float64
         np.testing.assert_allclose(
             result.detach().cpu().numpy(),
             1 / 3,

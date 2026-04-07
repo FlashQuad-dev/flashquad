@@ -29,7 +29,7 @@ def _resolve_backend_namespace(backend):
 
 def _default_dtype(xp):
     """Return the namespace-native default floating dtype."""
-    return getattr(xp, "float32")
+    return getattr(xp, "float64")
 
 
 def _validate_dtype(backend_name, dtype):
