@@ -70,6 +70,12 @@ results = fq.simpson(
 
 NumPy, PyTorch, CuPy, and JAX.
 
+## Links
+
+- [Documentation](https://flashquad.readthedocs.io)
+- [GitHub](https://github.com/FlashQuad-dev/flashquad)
+- [PyPI](https://pypi.org/project/flashquad/)
+
 ## License
 
 MIT
