@@ -86,6 +86,8 @@ a Creative Commons Attribution 4.0 International License (CC BY
 <body>
 <sec id="summary">
   <title>Summary</title>
+  <p>We developed a numerical integration package based on Python,
+  capable of providing</p>
   <p>We developed a numerical integration package for arbitrary
   dimensions based on PyTorch, capable of providing faster parallel
   calculation speed and less memory usage compared to torchquad on GPU.
