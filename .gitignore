@@ -12,3 +12,5 @@ build/
 
 *.lock
 !uv.lock
+
+.DS_Store
