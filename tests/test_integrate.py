@@ -1,39 +1,142 @@
-import sys
-import os
-import cupy as cp
-import time
+import numpy as np
+import pytest
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))# to parent dir  
-from flashquad import trapz_integrate, simpson_integrate, booles_integrate, gauss_integrate, mc_integrate, adpmc_integrate
-from flashquad import set_backend, get_data_type
+from flashquad import (
+    trapz_integrate,
+    simpson_integrate,
+    booles_integrate,
+    gauss_integrate,
+    mc_integrate,
+    adpmc_integrate,
+)
 
-data_type=cp.float32
-set_backend(data_type)
 
-def function(x, y, z, params):
-    a = params[0]
-    b = params[1]
-    c = params[2]
-    return a * cp.exp(-b * (x**2 + y**2 + z**2)) + c * cp.sin(x) * cp.cos(y) * cp.exp(z)
+# --- Integrands with known analytical results ---
 
-def boundary(x, y, z):
-    return x**2 + y**2 + z**2 < 10
+def square(x):
+    """x^2, integral on [0,1] = 1/3."""
+    return x ** 2
 
-a_values = cp.linspace(1.0, 10.0, 10000, dtype=data_type)
-b_values = cp.linspace(2.0, 20.0, 10000, dtype=data_type)
-c_values = cp.linspace(0.5, 5, 10000, dtype=data_type)
-param_values = cp.stack((a_values, b_values, c_values), axis=1) 
 
-bound = [[0, 1], [0, 1], [0, 1]]
-num_point = [33, 33, 33]
+def xy(x, y):
+    """x*y, integral on [0,1]^2 = 1/4."""
+    return x * y
 
-start_time = time.time()
-integral_values = trapz_integrate(function, param_values, bound, num_point, boundary)
-end_time = time.time()
-elapsed_time = end_time - start_time
 
-print(integral_values)
-print("time used: " + str(elapsed_time) + "s")
-print(integral_values.dtype)
-print(integral_values.device)
-print(a_values.dtype)
+def parametric_poly(x, params):
+    """a*x^2 + b, integral on [0,1] = a/3 + b."""
+    a, b = params[0], params[1]
+    return a * x ** 2 + b
+
+
+def unit_disk(x, y):
+    """Quarter-unit-disk mask in [0,1]^2."""
+    return x ** 2 + y ** 2 < 1.0
+
+
+PARAMS = np.array([[2.0, 1.0], [3.0, 0.5]])
+EXPECTED = PARAMS[:, 0] / 3 + PARAMS[:, 1]
+
+
+class TestTrapz:
+    def test_1d(self):
+        result = trapz_integrate(square, [[0, 1]], [1001])
+        np.testing.assert_allclose(result.item(), 1 / 3, rtol=1e-4)
+
+    def test_1d_with_params(self):
+        result = trapz_integrate(
+            parametric_poly, [[0, 1]], [1001], params=PARAMS,
+        )
+        np.testing.assert_allclose(result, EXPECTED, rtol=1e-4)
+
+    def test_2d(self):
+        result = trapz_integrate(xy, [[0, 1], [0, 1]], [101, 101])
+        np.testing.assert_allclose(result.item(), 0.25, rtol=1e-3)
+
+
+class TestSimpson:
+    def test_1d(self):
+        result = simpson_integrate(square, [[0, 1]], [1001])
+        np.testing.assert_allclose(result.item(), 1 / 3, rtol=1e-10)
+
+    def test_1d_with_params(self):
+        result = simpson_integrate(
+            parametric_poly, [[0, 1]], [1001], params=PARAMS,
+        )
+        np.testing.assert_allclose(result, EXPECTED, rtol=1e-10)
+
+
+class TestBooles:
+    def test_1d(self):
+        result = booles_integrate(square, [[0, 1]], [1001])
+        np.testing.assert_allclose(result.item(), 1 / 3, rtol=1e-10)
+
+    def test_1d_with_params(self):
+        result = booles_integrate(
+            parametric_poly, [[0, 1]], [1001], params=PARAMS,
+        )
+        np.testing.assert_allclose(result, EXPECTED, rtol=1e-10)
+
+
+class TestGauss:
+    def test_1d(self):
+        result = gauss_integrate(square, [[0, 1]], [50])
+        np.testing.assert_allclose(result.item(), 1 / 3, rtol=1e-10)
+
+    def test_1d_with_params(self):
+        result = gauss_integrate(
+            parametric_poly, [[0, 1]], [50], params=PARAMS,
+        )
+        np.testing.assert_allclose(result, EXPECTED, rtol=1e-10)
+
+    def test_2d(self):
+        result = gauss_integrate(xy, [[0, 1], [0, 1]], [20, 20])
+        np.testing.assert_allclose(result.item(), 0.25, rtol=1e-10)
+
+
+class TestMC:
+    def test_1d(self):
+        np.random.seed(42)
+        result = mc_integrate(square, [[0, 1]], 500_000)
+        np.testing.assert_allclose(result.item(), 1 / 3, rtol=0.05)
+
+    def test_1d_with_params(self):
+        np.random.seed(42)
+        result = mc_integrate(
+            parametric_poly, [[0, 1]], 500_000, params=PARAMS,
+        )
+        np.testing.assert_allclose(result, EXPECTED, rtol=0.05)
+
+
+class TestAdaptiveMC:
+    def test_1d(self):
+        np.random.seed(42)
+        result = adpmc_integrate(
+            square, [[0, 1]], 500_000, num_iterations=5,
+        )
+        np.testing.assert_allclose(result.item(), 1 / 3, rtol=0.05)
+
+
+class TestBoundary:
+    def test_trapz_with_boundary(self):
+        result = trapz_integrate(
+            xy, [[0, 1], [0, 1]], [201, 201],
+            boundary=unit_disk,
+        )
+        # Integral of x*y over the quarter unit disk = 1/8
+        np.testing.assert_allclose(result.item(), 0.125, rtol=0.05)
+
+
+class TestExplicitBackend:
+    def test_xp_parameter(self):
+        result = trapz_integrate(
+            square, [[0, 1]], [1001], xp=np,
+        )
+        np.testing.assert_allclose(result.item(), 1 / 3, rtol=1e-4)
+
+    def test_dtype_float32(self):
+        result = trapz_integrate(
+            square, [[0, 1]], [1001], dtype=np.float32,
+        )
+        assert result.dtype == np.float32
+        np.testing.assert_allclose(result.item(), 1 / 3, rtol=1e-4)
