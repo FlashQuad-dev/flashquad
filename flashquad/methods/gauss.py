@@ -14,7 +14,9 @@ def _gauss_nodes_weights(xp, n, dtype, device=None):
     return nodes, weights
 
 
-def gauss(xp, dtype, func, intervals, num_points, *, params=None, boundary=None, device=None):
+def gauss(
+    xp, dtype, func, intervals, num_points, *, params=None, boundary=None, device=None
+):
     """Integrate using Gauss-Legendre quadrature."""
     ndim = len(intervals)
 

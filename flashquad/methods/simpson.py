@@ -22,7 +22,9 @@ def _simpsons_rule(xp, y, x, axis):
     return xp.sum(y * c, axis=axis) * dx / 3
 
 
-def simpson(xp, dtype, func, intervals, num_points, *, params=None, boundary=None, device=None):
+def simpson(
+    xp, dtype, func, intervals, num_points, *, params=None, boundary=None, device=None
+):
     """Integrate using composite Simpson's 1/3 rule."""
     ndim = len(intervals)
     grids, expanded_mesh = _build_grid(xp, intervals, num_points, dtype, device)

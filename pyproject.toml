@@ -37,5 +37,8 @@ Homepage = "https://github.com/FlashQuad-dev/flashquad"
 requires = ["uv-build>=0.11.2,<0.12"]
 build-backend = "uv_build"
 
+[tool.pytest.ini_options]
+markers = ["gpu: test requires a GPU backend (torch, jax, cupy)"]
+
 [tool.uv.build-backend]
 module-root = ""

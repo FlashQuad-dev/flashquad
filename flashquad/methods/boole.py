@@ -28,7 +28,9 @@ def _booles_rule(xp, y, x, axis):
     return xp.sum(y * c, axis=axis) * 2 * dx / 45
 
 
-def booles(xp, dtype, func, intervals, num_points, *, params=None, boundary=None, device=None):
+def booles(
+    xp, dtype, func, intervals, num_points, *, params=None, boundary=None, device=None
+):
     """Integrate using composite Boole's rule."""
     ndim = len(intervals)
     grids, expanded_mesh = _build_grid(xp, intervals, num_points, dtype, device)

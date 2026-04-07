@@ -20,7 +20,9 @@ def _trapezoid(xp, y, x, axis):
     return xp.sum(y * c, axis=axis) * dx
 
 
-def trapz(xp, dtype, func, intervals, num_points, *, params=None, boundary=None, device=None):
+def trapz(
+    xp, dtype, func, intervals, num_points, *, params=None, boundary=None, device=None
+):
     """Integrate using the composite trapezoidal rule."""
     ndim = len(intervals)
     grids, expanded_mesh = _build_grid(xp, intervals, num_points, dtype, device)

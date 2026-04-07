@@ -6,7 +6,9 @@ from flashquad.methods.rand import _rand
 from flashquad.utils import _to_device
 
 
-def mc(xp, dtype, func, intervals, num_points, *, params=None, boundary=None, device=None):
+def mc(
+    xp, dtype, func, intervals, num_points, *, params=None, boundary=None, device=None
+):
     """Integrate using Monte Carlo sampling."""
     if not isinstance(num_points, int):
         num_points = int(np.prod(num_points))
