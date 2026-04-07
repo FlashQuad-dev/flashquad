@@ -1,7 +1,12 @@
 """FlashQuad — numerical integrator with pluggable array backends."""
 
 from typing import Any
-from flashquad.utils import _resolve_backend_namespace, _default_dtype, _validate_dtype
+from flashquad.utils import (
+    _resolve_backend_namespace,
+    _default_dtype,
+    _validate_dtype,
+    _resolve_device,
+)
 from flashquad.methods import trapz as _trapz
 from flashquad.methods import simpson as _simpson
 from flashquad.methods import booles as _booles
@@ -11,7 +16,7 @@ from flashquad.methods import adpmc as _adpmc
 
 
 class FlashQuad:
-    """Numerical integrator bound to a specific array backend and dtype.
+    """Numerical integrator bound to a specific array backend, dtype, and device.
 
     Parameters
     ----------
@@ -23,9 +28,14 @@ class FlashQuad:
         For ``'torch'`` pass a ``torch.dtype`` (e.g. ``torch.float64``);
         for numpy-compatible backends pass a numpy dtype (e.g. ``numpy.float64``).
         Defaults to the backend's ``float64``.
+    device : optional
+        Compute device.  For ``'torch'``, pass a string (``'cuda'``,
+        ``'cpu'``, ``'cuda:0'``, …) or a ``torch.device``.  When ``None``
+        (the default) the torch backend auto-selects CUDA if available.
+        Ignored for other backends.
     """
 
-    def __init__(self, backend: str, dtype: Any = None):
+    def __init__(self, backend: str, dtype: Any = None, device=None):
         if not isinstance(backend, str):
             raise TypeError(f"backend must be a string, got {type(backend).__name__}")
         self._backend_name = backend
@@ -35,9 +45,14 @@ class FlashQuad:
             self.dtype = dtype
         else:
             self.dtype = _default_dtype(self.xp)
+        self.device = _resolve_device(backend, device)
 
     def __repr__(self):
-        return f"FlashQuad(backend={self._backend_name!r}, dtype={self.dtype!r})"
+        parts = f"FlashQuad(backend={self._backend_name!r}, dtype={self.dtype!r}"
+        if self.device is not None:
+            parts += f", device={self.device!r}"
+        parts += ")"
+        return parts
 
     # ---- integration methods ------------------------------------------------
 
@@ -69,6 +84,7 @@ class FlashQuad:
             num_points,
             params=params,
             boundary=boundary,
+            device=self.device,
         )
 
     def simpson(
@@ -92,6 +108,7 @@ class FlashQuad:
             num_points,
             params=params,
             boundary=boundary,
+            device=self.device,
         )
 
     def booles(
@@ -115,6 +132,7 @@ class FlashQuad:
             num_points,
             params=params,
             boundary=boundary,
+            device=self.device,
         )
 
     def gauss(
@@ -138,6 +156,7 @@ class FlashQuad:
             num_points,
             params=params,
             boundary=boundary,
+            device=self.device,
         )
 
     def mc(
@@ -166,6 +185,7 @@ class FlashQuad:
             num_points,
             params=params,
             boundary=boundary,
+            device=self.device,
         )
 
     def adpmc(
@@ -197,4 +217,5 @@ class FlashQuad:
             params=params,
             boundary=boundary,
             num_iterations=num_iterations,
+            device=self.device,
         )

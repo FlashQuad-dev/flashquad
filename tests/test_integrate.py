@@ -18,9 +18,8 @@ def xy(x, y):
     return x * y
 
 
-def parametric_poly(x, params):
+def parametric_poly(x, a, b):
     """a*x^2 + b, integral on [0,1] = a/3 + b."""
-    a, b = params[0], params[1]
     return a * x**2 + b
 
 

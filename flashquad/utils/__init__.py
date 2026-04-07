@@ -7,6 +7,8 @@ from flashquad.utils.backend import (
     _resolve_backend_namespace,
     _default_dtype,
     _validate_dtype,
+    _resolve_device,
+    _to_device,
 )
 
 __all__ = [
@@ -16,4 +18,6 @@ __all__ = [
     "_resolve_backend_namespace",
     "_default_dtype",
     "_validate_dtype",
+    "_resolve_device",
+    "_to_device",
 ]
