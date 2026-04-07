@@ -6,12 +6,14 @@ A user-friendly Python numerical integration library with GPU acceleration.
 
 We recommend using [uv](https://docs.astral.sh/uv/):
 ```bash
+uv init
 uv add flashquad
 uv sync
 ```
 or directly install:
 
 ```bash
+uv venv
 uv pip install flashquad
 ```
 
