@@ -29,9 +29,16 @@ dev = [
     "cupy-cuda13x==14.0.1",
     "jax[cuda13]==0.9.2",
 ]
+docs = [
+    "sphinx>=8.0",
+    "myst-parser>=4.0",
+    "sphinx-autodoc2>=0.5",
+    "furo>=2024.8",
+]
 
 [project.urls]
 Homepage = "https://github.com/FlashQuad-dev/flashquad"
+Documentation = "https://flashquad.readthedocs.io"
 
 [build-system]
 requires = ["uv-build>=0.11.2,<0.12"]

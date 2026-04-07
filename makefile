@@ -3,6 +3,9 @@ all:
 	uv run ruff format
 	uv run ruff check --fix
 
+docs:
+	uv run --extra docs sphinx-build docs docs/_build/html
+
 test:
 	uv run pytest
 
