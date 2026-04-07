@@ -1,4 +1,4 @@
-from flashquad.integrate import FlashQuad
+from flashquad.integrator import FlashQuad
 
 __all__ = [
     "FlashQuad",

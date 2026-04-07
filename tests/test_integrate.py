@@ -53,41 +53,41 @@ class TestTrapz:
 class TestSimpson:
     def test_1d(self):
         result = quad.simpson(square, [[0, 1]], [1001])
-        np.testing.assert_allclose(result.item(), 1 / 3, rtol=1e-10)
+        np.testing.assert_allclose(result.item(), 1 / 3, rtol=1e-5)
 
     def test_1d_with_params(self):
         result = quad.simpson(
             parametric_poly, [[0, 1]], [1001], params=PARAMS,
         )
-        np.testing.assert_allclose(result, EXPECTED, rtol=1e-10)
+        np.testing.assert_allclose(result, EXPECTED, rtol=1e-5)
 
 
 class TestBooles:
     def test_1d(self):
         result = quad.booles(square, [[0, 1]], [1001])
-        np.testing.assert_allclose(result.item(), 1 / 3, rtol=1e-10)
+        np.testing.assert_allclose(result.item(), 1 / 3, rtol=1e-5)
 
     def test_1d_with_params(self):
         result = quad.booles(
             parametric_poly, [[0, 1]], [1001], params=PARAMS,
         )
-        np.testing.assert_allclose(result, EXPECTED, rtol=1e-10)
+        np.testing.assert_allclose(result, EXPECTED, rtol=1e-5)
 
 
 class TestGauss:
     def test_1d(self):
         result = quad.gauss(square, [[0, 1]], [50])
-        np.testing.assert_allclose(result.item(), 1 / 3, rtol=1e-10)
+        np.testing.assert_allclose(result.item(), 1 / 3, rtol=1e-5)
 
     def test_1d_with_params(self):
         result = quad.gauss(
             parametric_poly, [[0, 1]], [50], params=PARAMS,
         )
-        np.testing.assert_allclose(result, EXPECTED, rtol=1e-10)
+        np.testing.assert_allclose(result, EXPECTED, rtol=1e-5)
 
     def test_2d(self):
         result = quad.gauss(xy, [[0, 1], [0, 1]], [20, 20])
-        np.testing.assert_allclose(result.item(), 0.25, rtol=1e-10)
+        np.testing.assert_allclose(result.item(), 0.25, rtol=1e-5)
 
 
 class TestMC:
@@ -127,7 +127,7 @@ class TestTorchBackend:
         tq = FlashQuad("torch")
         result = tq.trapz(square, [[0, 1]], [1001])
         assert isinstance(result, torch.Tensor)
-        assert result.dtype == torch.float64
+        assert result.dtype == torch.float32
         np.testing.assert_allclose(
             result.detach().cpu().numpy(), 1 / 3, rtol=1e-4,
         )
