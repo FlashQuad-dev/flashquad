@@ -1,3 +1,5 @@
+.PHONY: all docs test test-cpu format check fix
+
 all:
 	uv run pytest
 	uv run ruff format
