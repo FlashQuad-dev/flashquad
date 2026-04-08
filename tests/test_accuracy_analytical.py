@@ -90,11 +90,6 @@ class TestAnalyticalMC:
         result = quad.mc(square, [[0, 1]], 500_000)
         np.testing.assert_allclose(to_numpy(result).item(), 1 / 3, rtol=0.05)
 
-    def test_adpmc_square(self, quad):
-        np.random.seed(42)
-        result = quad.adpmc(square, [[0, 1]], 500_000, num_iterations=5)
-        np.testing.assert_allclose(to_numpy(result).item(), 1 / 3, rtol=0.05)
-
 
 # ---------------------------------------------------------------------------
 # Batched parameter tests — all deterministic methods

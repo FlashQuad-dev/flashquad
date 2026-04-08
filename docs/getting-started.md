@@ -115,4 +115,3 @@ result = fq.simpson(
 | Boole's | `fq.booles(...)` | Higher order; `(num_points - 1)` divisible by 4 |
 | Gauss-Legendre | `fq.gauss(...)` | High accuracy for smooth functions |
 | Monte Carlo | `fq.mc(...)` | `num_points` is total sample count (single int) |
-| Adaptive Monte Carlo | `fq.adpmc(...)` | Iterative refinement; extra `num_iterations` arg |

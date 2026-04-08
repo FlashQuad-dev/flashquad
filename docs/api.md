@@ -33,7 +33,6 @@ fq.method(func, intervals, num_points, *, params=None, boundary=None)
 | {py:obj}`~flashquad.integrator.FlashQuad.booles` | Composite Boole's rule | `(num_points - 1)` divisible by 4 |
 | {py:obj}`~flashquad.integrator.FlashQuad.gauss` | Gauss-Legendre quadrature | — |
 | {py:obj}`~flashquad.integrator.FlashQuad.mc` | Monte Carlo sampling | `num_points` is a single int |
-| {py:obj}`~flashquad.integrator.FlashQuad.adpmc` | Adaptive Monte Carlo | Extra `num_iterations` kwarg |
 
 **Common arguments:**
 

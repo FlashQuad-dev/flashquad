@@ -64,7 +64,6 @@ results = fq.simpson(
 | Boole's | `fq.booles(...)` |
 | Gauss-Legendre | `fq.gauss(...)` |
 | Monte Carlo | `fq.mc(...)` |
-| Adaptive Monte Carlo | `fq.adpmc(...)` |
 
 ## Backends
 

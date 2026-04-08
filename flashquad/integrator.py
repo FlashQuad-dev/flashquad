@@ -12,7 +12,6 @@ from flashquad.methods import simpson as _simpson
 from flashquad.methods import booles as _booles
 from flashquad.methods import gauss as _gauss
 from flashquad.methods import mc as _mc
-from flashquad.methods import adpmc as _adpmc
 
 
 class FlashQuad:
@@ -188,34 +187,3 @@ class FlashQuad:
             device=self.device,
         )
 
-    def adpmc(
-        self,
-        func,
-        intervals,
-        num_points,
-        *,
-        params=None,
-        boundary=None,
-        num_iterations=10,
-    ):
-        """Integrate using iterative Monte Carlo sampling.
-
-        Args:
-            func: Integrand function.
-            intervals: Integration bounds per dimension.
-            num_points: Random samples per iteration (single integer).
-            params: Parameter array shaped ``(batch, num_params)``.
-            boundary: Optional mask function.
-            num_iterations: Number of sampling iterations.
-        """
-        return _adpmc(
-            self.xp,
-            self.dtype,
-            func,
-            intervals,
-            num_points,
-            params=params,
-            boundary=boundary,
-            num_iterations=num_iterations,
-            device=self.device,
-        )
