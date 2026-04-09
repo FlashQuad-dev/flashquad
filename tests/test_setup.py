@@ -1,5 +1,8 @@
 """Tests for FlashQuad construction, backend/dtype validation, and repr."""
 
+import subprocess
+import sys
+
 import numpy as np
 import pytest
 
@@ -39,6 +42,14 @@ class TestDtypeValidation:
     def test_numpy_dtype_rejected_for_torch(self):
         with pytest.raises(TypeError, match="not compatible with backend 'torch'"):
             FlashQuad("torch", dtype=np.float32)
+
+    def test_integer_dtype_rejected_for_numpy(self):
+        with pytest.raises(TypeError, match="floating-point"):
+            FlashQuad("numpy", dtype=np.int32)
+
+    def test_complex_dtype_rejected_for_numpy(self):
+        with pytest.raises(TypeError, match="floating-point"):
+            FlashQuad("numpy", dtype=np.complex64)
 
 
 # ---------------------------------------------------------------------------
@@ -114,6 +125,24 @@ class TestJaxBackend:
         q = FlashQuad("jax")
         assert q.dtype == jnp.float64
 
+    def test_default_dtype_enables_x64_in_fresh_process(self):
+        code = """
+import jax
+from flashquad import FlashQuad
+q = FlashQuad("jax")
+r = q.trapz(lambda x: x**2, [[0, 1]], [11])
+print(jax.config.jax_enable_x64)
+print(r.dtype)
+"""
+        proc = subprocess.run(
+            [sys.executable, "-c", code],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        lines = proc.stdout.strip().splitlines()
+        assert lines == ["True", "float64"]
+
     def test_result_is_jax_array(self):
         import jax
 
@@ -130,6 +159,11 @@ class TestJaxBackend:
         result = q.trapz(square, [[0, 1]], [1001])
         assert isinstance(result, jax.Array)
         assert result.dtype == jnp.float32
+
+    def test_mc_respects_explicit_cpu_device(self):
+        q = FlashQuad("jax", device="cpu")
+        result = q.mc(square, [[0, 1]], 128)
+        assert {device.platform for device in result.devices()} == {"cpu"}
 
 
 # ---------------------------------------------------------------------------

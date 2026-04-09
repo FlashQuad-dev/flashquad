@@ -86,6 +86,15 @@ class TestBatchedParams:
         result = quad.trapz(parametric_poly, [[0, 1]], [1001], params=params)
         np.testing.assert_allclose(to_numpy(result), expected, rtol=1e-4)
 
+    def test_mc_single_param_row_preserves_batch_shape(self, quad):
+        np.random.seed(42)
+        single = np.array([[2.0, 1.0]])
+        expected = np.array([2.0 / 3 + 1.0])
+        params = convert_params(quad, single)
+        result = quad.mc(parametric_poly, [[0, 1]], 500_000, params=params)
+        assert to_numpy(result).shape == (1,)
+        np.testing.assert_allclose(to_numpy(result), expected, rtol=0.05)
+
 
 # ---------------------------------------------------------------------------
 # Different sample points per dimension

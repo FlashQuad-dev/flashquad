@@ -43,7 +43,7 @@ class FlashQuad:
             _validate_dtype(backend, dtype)
             self.dtype = dtype
         else:
-            self.dtype = _default_dtype(self.xp)
+            self.dtype = _default_dtype(self.xp, backend)
         self.device = _resolve_device(backend, device)
 
     def __repr__(self):
@@ -186,4 +186,3 @@ class FlashQuad:
             boundary=boundary,
             device=self.device,
         )
-

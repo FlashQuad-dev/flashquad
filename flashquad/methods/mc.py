@@ -35,4 +35,7 @@ def mc(
     if boundary is not None:
         Y = Y * boundary(*samples)
 
-    return volume * xp.mean(Y, axis=1).squeeze()
+    result = volume * xp.mean(Y, axis=1)
+    if params is None:
+        return xp.reshape(result, ())
+    return xp.reshape(result, (vector_length,))

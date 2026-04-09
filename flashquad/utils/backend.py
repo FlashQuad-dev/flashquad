@@ -27,8 +27,18 @@ def _resolve_backend_namespace(backend):
         ) from exc
 
 
-def _default_dtype(xp):
+def _enable_jax_x64():
+    """Enable JAX x64 mode when available and currently disabled."""
+    import jax
+
+    if not jax.config.jax_enable_x64:
+        jax.config.update("jax_enable_x64", True)
+
+
+def _default_dtype(xp, backend_name=None):
     """Return the namespace-native default floating dtype."""
+    if backend_name == "jax":
+        _enable_jax_x64()
     return getattr(xp, "float64")
 
 
@@ -41,6 +51,11 @@ def _validate_dtype(backend_name, dtype):
             raise TypeError(
                 f"dtype {dtype!r} is not compatible with backend 'torch'. "
                 f"Use a torch dtype (e.g., torch.float32, torch.float64)."
+            )
+        if not dtype.is_floating_point:
+            raise TypeError(
+                f"dtype {dtype!r} is not compatible with backend 'torch'. "
+                "Use a floating-point torch dtype."
             )
         return
 
@@ -56,11 +71,18 @@ def _validate_dtype(backend_name, dtype):
         pass
 
     try:
-        np.dtype(dtype)
+        resolved_dtype = np.dtype(dtype)
     except TypeError:
         raise TypeError(
             f"dtype {dtype!r} is not compatible with backend {backend_name!r}."
         )
+    if not np.issubdtype(resolved_dtype, np.floating):
+        raise TypeError(
+            f"dtype {dtype!r} is not compatible with backend {backend_name!r}. "
+            "Use a floating-point numpy-compatible dtype."
+        )
+    if backend_name == "jax" and resolved_dtype == np.dtype(np.float64):
+        _enable_jax_x64()
 
 
 def _resolve_device(backend_name, device):

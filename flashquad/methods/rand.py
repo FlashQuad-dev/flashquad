@@ -27,7 +27,7 @@ def _rand(xp, shape, dtype, device):
 
         if hasattr(xp, "__name__") and "jax" in xp.__name__:
             key = jax.random.PRNGKey(np.random.randint(0, 2**31))
-            return jax.random.uniform(key, shape, dtype=dtype)
+            return _to_device(jax.random.uniform(key, shape, dtype=dtype), device)
     except ImportError:
         pass
     return _to_device(xp.asarray(np.random.rand(*shape), dtype=dtype), device)
