@@ -29,6 +29,11 @@ dev = [
     "cupy-cuda13x==14.0.1",
     "jax[cuda13]==0.9.2",
 ]
+fuzz = [
+    "scipy==1.17.1",
+    "torch==2.11.0",
+    "torchquad==0.5.0",
+]
 docs = [
     "sphinx>=8.0",
     "myst-parser>=4.0",
